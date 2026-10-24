@@ -1,0 +1,23 @@
+# Garde Sunu Caisse réveillé pendant les heures d'ouverture des boutiques.
+# Render (formule gratuite) endort le service après 15 minutes sans visite ;
+# une visite toutes les 10 minutes évite les 30 à 60 secondes de réveil.
+# Heures en UTC, identiques à l'heure de Dakar : de 7 h à 22 h 50, tous les jours.
+# À supprimer quand Sunu Caisse passera en formule payante (Starter).
+name: Réveil de Sunu Caisse
+
+on:
+  schedule:
+    - cron: "*/10 7-22 * * *"
+  # Bouton « Run workflow » pour lancer un réveil à la main.
+  workflow_dispatch:
+
+jobs:
+  reveil:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Visite de l'adresse de santé
+        run: |
+          curl --fail --silent --show-error --retry 3 --retry-delay 10 --max-time 90 \
+            -o /dev/null -w "Réponse %{http_code} en %{time_total} s\n" \
+            https://sunu-caisse.onrender.com/api/sante
